@@ -1,4 +1,5 @@
 # Gestión Empresarial RD
+Trabajo final de Ingeniería de Software 2.
 
 **Sistema web cliente-servidor para administrar inventario, compras, ventas y suplidores de pequeños comercios.**
 
