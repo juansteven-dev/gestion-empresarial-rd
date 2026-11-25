@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { RequireAuth } from './auth/RequireAuth'
-import { catalogManagerRoles, RequireRoles } from './auth/RequireRoles'
+import { catalogManagerRoles, RequireRoles, salesRoles } from './auth/RequireRoles'
 import { AppLayout } from './components/AppLayout'
 import { PlaceholderPage } from './components/PlaceholderPage'
 import { CategoriesPage } from './pages/CategoriesPage'
@@ -9,6 +9,7 @@ import { LoginPage } from './pages/LoginPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { PurchasesPage } from './pages/PurchasesPage'
 import { SuppliersPage } from './pages/SuppliersPage'
+import { SalesPage } from './pages/SalesPage'
 import './App.css'
 
 function App() {
@@ -36,16 +37,9 @@ function App() {
               <Route path="inventory" element={<InventoryPage />} />
               <Route path="purchases" element={<PurchasesPage />} />
             </Route>
-            <Route
-              path="sales"
-              element={
-                <PlaceholderPage
-                  section="Operaciones"
-                  title="Ventas"
-                  description="Esta ruta esta preparada para el futuro modulo de ventas."
-                />
-              }
-            />
+            <Route element={<RequireRoles roles={salesRoles} />}>
+              <Route path="sales" element={<SalesPage />} />
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

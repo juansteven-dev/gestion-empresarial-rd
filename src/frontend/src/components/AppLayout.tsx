@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { getApiErrorMessage } from '../api/httpClient'
 import { useAuth } from '../auth/AuthContext'
-import { catalogManagerRoles } from '../auth/RequireRoles'
+import { catalogManagerRoles, salesRoles } from '../auth/RequireRoles'
 
 const navigationItems: { to: string; label: string; end?: boolean; roles?: string[] }[] = [
   { to: '/dashboard', label: 'Resumen', end: true },
@@ -11,7 +11,7 @@ const navigationItems: { to: string; label: string; end?: boolean; roles?: strin
   { to: '/suppliers', label: 'Suplidores', roles: catalogManagerRoles },
   { to: '/inventory', label: 'Inventario', roles: catalogManagerRoles },
   { to: '/purchases', label: 'Compras', roles: catalogManagerRoles },
-  { to: '/sales', label: 'Ventas' },
+  { to: '/sales', label: 'Ventas', roles: salesRoles },
 ]
 
 export function AppLayout() {

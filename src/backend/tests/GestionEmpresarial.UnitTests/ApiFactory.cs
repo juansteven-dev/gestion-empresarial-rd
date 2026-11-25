@@ -1,10 +1,12 @@
 using GestionEmpresarial.Api.Authorization;
+using GestionEmpresarial.Domain.Entities;
 using GestionEmpresarial.Infrastructure.Persistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -22,6 +24,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
 {
     private readonly DirectoryInfo dataProtectionKeys = new(
         Path.Combine(Path.GetTempPath(), $"GestionEmpresarialTests-{Guid.NewGuid():N}"));
+
+    public SaleTestSaveChangesInterceptor SaleSaveChangesInterceptor { get; } = new();
 
     public ApiFactory()
     {
@@ -83,8 +87,84 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
             services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseInMemoryDatabase("GestionEmpresarialAuthenticationTests"));
+                options
+                    .UseInMemoryDatabase("GestionEmpresarialAuthenticationTests")
+                    .AddInterceptors(SaleSaveChangesInterceptor));
         });
+    }
+}
+
+public sealed class SaleTestSaveChangesInterceptor : SaveChangesInterceptor
+{
+    private readonly object rowVersionLock = new();
+    private readonly Dictionary<int, byte[]> currentRowVersions = [];
+    private int isBarrierArmed;
+    private int arrivals;
+    private TaskCompletionSource releaseBarrier = CompletedSource();
+
+    public void ArmForTwoConcurrentSales()
+    {
+        arrivals = 0;
+        releaseBarrier = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Volatile.Write(ref isBarrierArmed, 1);
+    }
+
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
+    {
+        var context = eventData.Context;
+        if (context is null)
+        {
+            return result;
+        }
+
+        if (Volatile.Read(ref isBarrierArmed) == 1
+            && context.ChangeTracker.Entries<Sale>().Any(entry => entry.State == EntityState.Added))
+        {
+            if (Interlocked.Increment(ref arrivals) == 2)
+            {
+                Volatile.Write(ref isBarrierArmed, 0);
+                releaseBarrier.TrySetResult();
+            }
+
+            await releaseBarrier.Task.WaitAsync(cancellationToken);
+        }
+
+        var modifiedProducts = context.ChangeTracker.Entries<Product>()
+            .Where(entry => entry.State == EntityState.Modified)
+            .ToArray();
+        lock (rowVersionLock)
+        {
+            foreach (var entry in modifiedProducts)
+            {
+                var originalVersion = entry.Property(nameof(Product.RowVersion)).OriginalValue as byte[] ?? [];
+                if (currentRowVersions.TryGetValue(entry.Entity.ProductId, out var savedVersion)
+                    && !savedVersion.AsSpan().SequenceEqual(originalVersion))
+                {
+                    throw new DbUpdateConcurrencyException("The product stock changed during the test sale.");
+                }
+            }
+
+            foreach (var entry in modifiedProducts)
+            {
+                var nextVersion = Guid.NewGuid().ToByteArray();
+                currentRowVersions[entry.Entity.ProductId] = nextVersion;
+                var rowVersion = entry.Property(nameof(Product.RowVersion));
+                rowVersion.CurrentValue = nextVersion;
+                rowVersion.IsModified = true;
+            }
+        }
+
+        return result;
+    }
+
+    private static TaskCompletionSource CompletedSource()
+    {
+        var source = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        source.SetResult();
+        return source;
     }
 }
 

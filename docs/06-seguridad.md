@@ -74,3 +74,7 @@ Restauración de demostración en otra base o instancia siguiendo las restriccio
 ## 8.8 Configuración implementada en la fase A
 
 La API implementa login, logout y consulta de sesión en `/api/v1/auth`; `GET /api/v1/auth/csrf` entrega el token que el cliente envía como `X-CSRF-TOKEN` en operaciones de escritura. La creación de cuentas está protegida por el rol `Administrador` en el servidor y no existe registro público. Los únicos roles válidos son `Administrador`, `Empleado` y `EncargadoAlmacen`. Las instrucciones locales para crear el primer administrador y retirar esos secretos después están en `src/backend/README.md`.
+
+## 8.9 Ventas implementadas en la fase D
+
+`POST /api/v1/sales` requiere sesión, rol `Administrador` o `Empleado` y token CSRF. El contrato solo contiene método de pago y líneas con `ProductId`/`Quantity`; cualquier importe calculado en el cliente se ignora. El servicio vuelve a leer producto activo, precio y stock, y guarda la operación dentro de una transacción SQL Server. `RowVersion` de Products convierte una modificación concurrente del stock en conflicto 409. El historial y el detalle de un Empleado solo muestran sus propias ventas; Administrador puede consultar todas. EncargadoAlmacen no puede registrar ni consultar ventas.

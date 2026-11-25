@@ -28,7 +28,7 @@ Explicar cómo crear borrador, agregar líneas, revisar total y recibir compra. 
 
 ## 7. Ventas
 
-Explicar cómo buscar producto, seleccionar cantidad, método de pago, confirmar, visualizar comprobante interno y qué sucede si no hay stock.
+Administrador y Empleado pueden buscar productos activos por nombre o SKU, agregarlos al carrito, indicar cantidades y elegir efectivo, tarjeta o transferencia. El sistema comprueba de nuevo el stock y el precio al confirmar; si las existencias cambiaron, muestra el conflicto para que se actualice el carrito. Al completar la operación se muestra el comprobante interno con número, líneas, subtotal, descuento, total y método de pago. Puede imprimirse desde el navegador; no es un comprobante fiscal.
 
 ## 8. Inventario
 
@@ -57,3 +57,7 @@ En Inventario, consulta el conteo y la lista de productos cuyo stock esta en el 
 Administrador y EncargadoAlmacen pueden abrir Compras. Usa Nueva compra, selecciona un suplidor activo y agrega una o mas lineas con producto, cantidad y costo unitario. Guardar borrador genera el numero de compra y muestra el documento en la lista; el stock no cambia en ese momento.
 
 Abre Detalle para revisar sus lineas. Cuando la mercancia haya llegado, usa Recibir. La operacion cambia el estado a Recibida, incrementa existencias y queda en el historial de movimientos y auditoria. El boton solo aparece para borradores; si una compra ya fue recibida, otra solicitud se rechaza.
+
+## 13. Ventas disponibles
+
+En Ventas, escribe al menos dos caracteres para buscar un producto activo y agrégalo al carrito. Define cantidad y método de pago, y confirma. El navegador envía solo identificador de producto, cantidad y método de pago; el servidor obtiene el precio válido, comprueba stock y calcula importes. Una venta concurrente que consuma las últimas unidades puede responder con un conflicto; revisa el carrito y vuelve a consultar el catálogo. El historial se filtra por número y fechas; Administrador también puede filtrar por ID de empleado. El detalle permite volver a abrir o imprimir el comprobante. Empleado ve sus propias ventas; Administrador puede consultar el historial global. EncargadoAlmacen no tiene acceso a este módulo. La fecha del comprobante se muestra según la zona horaria local del navegador y se almacena en UTC.

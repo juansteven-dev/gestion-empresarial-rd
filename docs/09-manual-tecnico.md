@@ -71,3 +71,11 @@ Las pruebas de integracion actuales reemplazan SQL Server por EF Core InMemory. 
 El controlador PurchasesController aplica autorizacion en servidor a Administrador y EncargadoAlmacen. GET /api/v1/purchases lista compras paginadas y admite search, supplierId, status, page y pageSize. GET /{id} devuelve el detalle. POST /api/v1/purchases crea un borrador; POST /{id}/receive confirma la recepcion. Las escrituras pasan por el filtro antifalsificacion global.
 
 La recepcion abre transaccion, reclama la fila con una actualizacion condicionada a Status Draft, incrementa cada producto, crea StockMovement por linea, marca Received y agrega AuditLog antes de confirmar. La condicion de estado evita que dos solicitudes concurrentes reciban el mismo documento; RowVersion de producto detecta conflictos de stock. Cualquier excepcion antes de confirmar revierte la transaccion en SQL Server. No hubo cambios de esquema porque las tablas y restricciones ya existen en la migracion inicial.
+
+## 12. Endpoints de ventas (Fase D)
+
+`SalesController` aplica autorizacion de servidor a Administrador y Empleado; GET y POST tambien pasan por el filtro antifalsificacion global en las escrituras. `GET /api/v1/sales` admite `search` por numero, `fromDate`, `toDate`, `page` y `pageSize`. El rol Administrador puede filtrar por `createdByUserId`; Empleado siempre queda limitado al usuario autenticado. `GET /api/v1/sales/{id}` aplica el mismo alcance. `POST /api/v1/sales` recibe solo `paymentMethod` y `items[{productId, quantity}]`.
+
+`SaleService` valida lineas y productos activos, obtiene `SalePrice` desde la base, calcula subtotal/total y descuenta stock. Guarda el encabezado y las lineas para obtener el ID; luego agrega un movimiento `Sale` por producto y `AuditLog`, y confirma todo en la misma transaccion SQL Server. `Products.RowVersion` evita que dos solicitudes concurrentes vendan las mismas unidades; el conflicto responde 409. No se agregaron tablas ni columnas porque la migracion inicial ya define Sales, SaleItems y StockMovements.
+
+`SalesEndpointTests` ejecuta la concurrencia con EF Core InMemory y un interceptor de pruebas que coordina las dos lecturas y simula el conflicto de RowVersion. Este proveedor no demuestra el rollback relacional de SQL Server; una validacion completa de transacciones debe ejecutarse contra una base de pruebas SQL Server.
