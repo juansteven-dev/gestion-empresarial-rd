@@ -19,6 +19,5 @@ internal sealed class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
         builder.Property(supplier => supplier.IsActive).HasDefaultValue(true);
         builder.Property(supplier => supplier.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
         builder.HasIndex(supplier => supplier.Name).HasDatabaseName("IX_Suppliers_Name");
-        builder.HasIndex(supplier => supplier.Name).HasDatabaseName("IX_Suppliers_Name");
     }
 }

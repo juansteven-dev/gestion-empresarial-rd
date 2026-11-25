@@ -48,3 +48,20 @@ Comandos realmente ejecutados para `dotnet test`, `dotnet build`, `npm run build
 ## 9. Despliegue y mantenimiento
 
 Documentar configuración de producción, HTTPS, secretos, backup, logs, actualización de dependencias y rollback de versión. Si no se despliega en producción, declararlo expresamente.
+
+## 10. API de catalogos e inventario (implementada)
+
+Los controladores estan en src/backend/src/GestionEmpresarial.Api/Controllers; sus contratos estan en Application y CatalogService implementa casos de uso y consultas en Infrastructure. Los controladores no acceden directamente a EF Core.
+
+| Ruta | Acceso | Funcion |
+|---|---|---|
+| GET /api/v1/products y GET /{id} | Cualquier usuario autenticado | Busqueda por nombre/SKU, filtro por categoria/estado/stock bajo y paginacion. |
+| POST, PUT /{id}, DELETE /{id} en /api/v1/products | Administrador, EncargadoAlmacen | Alta/edicion y desactivacion logica. El stock no se escribe desde el formulario de producto. |
+| GET de /api/v1/categories | Cualquier usuario autenticado | Consulta de nombres para filtrar productos. |
+| Escrituras en /api/v1/categories y CRUD en /api/v1/suppliers | Administrador, EncargadoAlmacen | CRUD y desactivacion logica. |
+| GET /api/v1/inventory/stock, /low-stock, /movements | Administrador, EncargadoAlmacen | Existencias, alertas y movimientos paginados. |
+| POST /api/v1/inventory/adjustments | Administrador, EncargadoAlmacen | Ajuste con motivo, validacion del balance, movimiento y auditoria transaccionales. |
+
+Los listados aceptan page y pageSize (1 a 100). Los errores de validacion responden 400 y los conflictos de SKU, categoria o stock responden 409 con Problem Details. Las escrituras requieren antiforgery. La migracion inicial ya contiene el esquema de catalogos e inventario; esta fase no cambio el esquema y no creo otra migracion.
+
+Las pruebas de integracion actuales reemplazan SQL Server por EF Core InMemory. Para validar indices unicos, RowVersion y transacciones relacionales en el entorno local, ejecutar ademas una prueba funcional contra una base SQL Server de desarrollo.

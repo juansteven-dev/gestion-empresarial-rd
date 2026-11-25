@@ -2,10 +2,14 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { getApiErrorMessage } from '../api/httpClient'
 import { useAuth } from '../auth/AuthContext'
+import { catalogManagerRoles } from '../auth/RequireRoles'
 
-const navigationItems = [
+const navigationItems: { to: string; label: string; end?: boolean; roles?: string[] }[] = [
   { to: '/dashboard', label: 'Resumen', end: true },
   { to: '/products', label: 'Productos' },
+  { to: '/categories', label: 'Categorias', roles: catalogManagerRoles },
+  { to: '/suppliers', label: 'Suplidores', roles: catalogManagerRoles },
+  { to: '/inventory', label: 'Inventario', roles: catalogManagerRoles },
   { to: '/purchases', label: 'Compras' },
   { to: '/sales', label: 'Ventas' },
 ]
@@ -13,6 +17,9 @@ const navigationItems = [
 export function AppLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const visibleNavigation = navigationItems.filter((item) =>
+    !item.roles || item.roles.some((role) => user?.roles.includes(role)),
+  )
   const [logoutError, setLogoutError] = useState('')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -40,7 +47,7 @@ export function AppLayout() {
 
         <p className="nav-heading">GESTIÓN</p>
         <nav className="primary-nav" aria-label="Navegación principal">
-          {navigationItems.map((item) => (
+          {visibleNavigation.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

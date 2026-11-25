@@ -151,3 +151,9 @@ La segunda llamada debe devolver 409 y no duplicar existencias.
 ## 6.7 Script
 
 `database/scripts/01-create-database.sql` se conserva únicamente como referencia histórica del starter y no debe ejecutarse. El esquema vigente se define en las entidades y configuraciones EF Core; las migraciones versionan sus cambios. `database/scripts/InitialCreate.sql` es el script de despliegue generado desde esas migraciones con `dotnet ef migrations script`. No editar ese artefacto manualmente: al cambiar el modelo, crear una migración y volver a generarlo.
+
+## 6.8 Catalogos e inventario implementados
+
+Categories, Products, Suppliers, StockMovements y AuditLogs ya estan incluidos en la migracion inicial. SKU tiene indice unico; precios, minimos y balance tienen restricciones no negativas. El producto comienza con stock cero. Las ediciones de nombre/precio no alteran el balance; los ajustes registran balance anterior, variacion, balance posterior, motivo, actor y fecha UTC junto con un AuditLog.
+
+La API desactiva categorias, productos y suplidores mediante IsActive; no elimina fisicamente los registros. Una categoria con productos activos no se puede desactivar hasta desactivar esos productos. La Fase B no anade columnas ni tablas, por lo que no requiere una migracion nueva.

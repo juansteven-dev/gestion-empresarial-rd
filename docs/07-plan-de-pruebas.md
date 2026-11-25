@@ -68,3 +68,13 @@ No cambiar `Completar al ejecutar` por `Aprobado` hasta que la prueba se ejecute
 Entrada: build de cliente/servidor sin errores; base de pruebas preparada; usuario y datos ficticios; requisitos disponibles.
 
 Salida: todos los QA Alta ejecutados; 0 defectos críticos abiertos; fallos conocidos documentados; evidencia guardada; `dotnet test` y `npm run build` ejecutados.
+
+## 10.7 Automatizacion agregada para la Fase B
+
+CatalogEndpointTests usa WebApplicationFactory y cubre paginacion de categorias; creacion y edicion; SKU duplicado; categoria inexistente y precio negativo; rechazo de ajuste sin motivo y de stock negativo; ajuste valido con movimiento y auditoria; alerta CurrentStock <= MinimumStock; desactivacion logica de producto/suplidor; y acceso por rol. La ejecucion real y el resultado final de esta suite deben quedar registrados por commit en la evidencia del equipo. EF Core InMemory no valida caracteristicas relacionales propias de SQL Server.
+## 10.8 Verificacion realizada (2026-11-25)
+
+- dotnet build src/backend/GestionEmpresarial.slnx --no-restore: compilacion correcta; 0 advertencias y 0 errores.
+- dotnet test src/backend/tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj --no-restore --logger "console;verbosity=minimal": 19 pruebas aprobadas, 0 fallidas y 0 omitidas. VSTest informo que VSTEST_ARTIFACTS_DIRECTORY no esta definida y uso un directorio temporal.
+- npm.cmd run build (desde src/frontend): compilacion TypeScript y Vite correctas; 139 modulos transformados.
+- La suite de API usa EF Core InMemory. No se ejecuto una prueba contra SQL Server real en esta fase.

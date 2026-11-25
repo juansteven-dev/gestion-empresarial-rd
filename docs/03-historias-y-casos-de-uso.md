@@ -64,3 +64,11 @@
 ## 3.4 Reglas para estimación
 
 Cada historia debe convertirse en tareas frontend, backend, persistencia y pruebas. Evitar historias “hacer módulo completo”; dividirlas por comportamiento verificable.
+
+## 3.5 Aceptacion de catalogos e inventario (Fase B)
+
+- HU-03 Productos: crear o editar requiere categoria activa, SKU unico, precios no negativos y existencia minima no negativa. La existencia actual no se edita en el formulario de producto.
+- HU-04 Alertas: el usuario de almacen consulta productos activos cuando CurrentStock <= MinimumStock.
+- HU-05 Suplidores: Administrador o EncargadoAlmacen puede buscar, filtrar por estado y desactivar un suplidor conservando sus datos.
+- HU-12 Ajustes: Administrador o EncargadoAlmacen indica producto, variacion y motivo. Una variacion que deje stock negativo se rechaza; una aceptada crea movimiento y auditoria.
+- Los listados de categorias, productos, suplidores, existencias y movimientos usan paginacion del servidor. Las escrituras requieren cookie autenticada y token antifalsificacion.

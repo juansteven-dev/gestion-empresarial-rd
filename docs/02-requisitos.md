@@ -79,3 +79,12 @@ Los requisitos usan identificadores estables. Cada requisito debe vincularse a u
 | RF-12, RF-13, RF-14 | Inventory | QA-11, QA-12 |
 | RF-15, RF-16 | Reports | QA-13 |
 | RF-17 | Audit | QA-14 |
+
+## 2.6 Aceptacion implementada en la Fase B
+
+- RF-04 y RF-05: categorias y productos tienen alta, consulta paginada, edicion y desactivacion logica. El SKU del producto se normaliza a mayusculas y debe ser unico.
+- RF-06 y RF-14: la busqueda admite nombre/SKU, categoria, estado y alerta de stock igual o inferior al minimo.
+- RF-07: suplidores se pueden crear, buscar, editar, filtrar por estado y desactivar sin borrar fisicamente el registro.
+- RF-12 y RF-13: el personal autorizado consulta existencias y movimientos; los ajustes exigen motivo y guardan movimiento y auditoria dentro de la misma operacion.
+- Precios, existencia minima y cantidades se validan en servidor. La existencia inicial de un producto es cero y solo cambia mediante movimientos de inventario.
+- La paginacion acepta page y pageSize; el servidor limita pageSize a 100.

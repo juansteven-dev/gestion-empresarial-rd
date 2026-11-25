@@ -11,6 +11,7 @@ var builderArguments = args.Where(argument =>
 var builder = WebApplication.CreateBuilder(builderArguments);
 
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<CatalogExceptionHandler>();
 builder.Services.AddHealthChecks();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.ConfigureApplicationCookie(options =>
@@ -74,14 +75,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-if (app.Environment.IsEnvironment("Testing"))
-{
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    app.UseExceptionHandler();
-}
+app.UseExceptionHandler();
 app.UseStatusCodePages();
 app.UseHttpsRedirection();
 app.UseAuthentication();

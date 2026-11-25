@@ -37,3 +37,15 @@ dotnet user-secrets remove --project src/backend/src/GestionEmpresarial.Api "Boo
 El arranque normal crea los tres roles de forma idempotente. El comando `--bootstrap-admin` solo crea una cuenta si todavía no existe un administrador; no restablece contraseñas. Identity aplica una clave de al menos 12 caracteres y bloquea la cuenta durante 15 minutos después de cinco intentos fallidos.
 
 Las pruebas de autenticación se ejecutan con `dotnet test src/backend/GestionEmpresarial.slnx`.
+
+## Catalogos e inventario (Fase B)
+
+La API expone DTOs paginados bajo /api/v1. Las categorias y suplidores se administran en /categories y /suppliers; la consulta de productos esta disponible para cualquier usuario autenticado en /products. Productos, categorias, suplidores y operaciones de inventario se pueden modificar por Administrador y EncargadoAlmacen. El servidor aplica los mismos permisos aunque se invoque la API directamente.
+
+- GET /api/v1/products: busca por search (nombre o SKU), filtra con categoryId, isActive y lowStockOnly, y pagina con page/pageSize (maximo 100). Admite GET /{id}, POST, PUT /{id} y DELETE /{id}; DELETE marca el producto inactivo.
+- /api/v1/categories: cualquier usuario autenticado puede consultar con GET y GET /{id}; POST, PUT /{id} y DELETE /{id} requieren Administrador o EncargadoAlmacen. DELETE desactiva; no borra fisicamente.
+- /api/v1/suppliers: GET, GET /{id}, POST, PUT /{id} y DELETE /{id} requieren Administrador o EncargadoAlmacen. DELETE desactiva; no borra fisicamente.
+- GET /api/v1/inventory/stock, /low-stock y /movements: existencia paginada, alertas con stock <= minimo e historial filtrable por producto/tipo/fecha.
+- POST /api/v1/inventory/adjustments: acepta productId, quantityDelta distinto de cero y reason obligatorio. El ajuste que produzca stock negativo devuelve 409. Un ajuste valido persiste producto, movimiento y auditoria en una transaccion.
+
+Toda escritura requiere el token de GET /api/v1/auth/csrf en X-CSRF-TOKEN. dotnet test src/backend/tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj ejecuta las pruebas de autenticacion y catalogos con WebApplicationFactory y EF Core InMemory; estas pruebas no sustituyen una validacion contra SQL Server.
