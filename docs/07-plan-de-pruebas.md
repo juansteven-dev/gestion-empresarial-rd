@@ -94,3 +94,12 @@ CatalogEndpointTests usa WebApplicationFactory y cubre paginacion de categorias;
 - Las pruebas cubren precio calculado por servidor pese a importes falsos, productos inactivos y stock insuficiente, venta de varias líneas sin cambios parciales cuando falla la validación, auditoría, roles, alcance del historial, filtros y carrera por la última unidad.
 - La carrera se coordinó en EF Core InMemory con un interceptor de pruebas que simula el control RowVersion; no equivale a concurrencia ni rollback en SQL Server. No se ejecutó contra SQL Server real, así que la reversión transaccional relacional queda pendiente de verificación en una base de pruebas.
 - No se cambió el modelo de datos ni se generó una migración; Sales, SaleItems y StockMovements ya están en InitialCreate.
+
+## 10.11 Verificación de la Fase E (2026-11-25)
+
+- `dotnet build src/backend/GestionEmpresarial.slnx --no-restore`: correcto; 0 advertencias y 0 errores.
+- `dotnet test src/backend/tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj --no-restore --logger "console;verbosity=minimal"`: 31 aprobadas, 0 fallidas y 0 omitidas. VSTest usó una carpeta temporal porque `VSTEST_ARTIFACTS_DIRECTORY` no está definida.
+- `npm.cmd run lint` desde `src/frontend`: código de salida 0; 0 errores y 1 advertencia `react(only-export-components)` en `src/auth/AuthContext.tsx`.
+- `npm.cmd run build` desde `src/frontend`: correcto; TypeScript compiló y Vite transformó 749 módulos. Reportes se genera como chunk separado.
+- Las pruebas nuevas ejercitan dashboard, reportes, usuarios y auditoría con roles. La suite utiliza EF Core InMemory; no se ejecutó una prueba contra SQL Server real.
+- Las vistas de inicio de sesión, dashboard, productos/categorías, suplidores, compras/recepción, punto de venta, inventario/movimientos, reportes, usuarios y auditoría consumen API. No quedan pantallas con mocks ni rutas de placeholder.

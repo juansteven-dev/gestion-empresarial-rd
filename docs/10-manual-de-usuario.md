@@ -2,7 +2,7 @@
 
 ## 1. Acceso
 
-Describir la URL local utilizada, pantalla de login, mensajes de validación y cierre de sesión. Incluir captura real.
+Abre la URL local configurada en Vite e ingresa el usuario y la contraseña asignados por el Administrador. Un error de credenciales aparece en la tarjeta de acceso. La barra superior identifica la cuenta y sus roles; usa Cerrar sesión para terminar.
 
 ## 2. Roles
 
@@ -12,7 +12,7 @@ Describir la URL local utilizada, pantalla de login, mensajes de validación y c
 
 ## 3. Dashboard
 
-Explicar tarjetas, filtros de período, alertas y significado de cada indicador.
+El Dashboard consulta el período elegido y presenta ventas completadas e importe, productos vendidos y alertas de existencias. Administrador ve ventas globales e inventario, Empleado solo sus propias ventas y EncargadoAlmacen alertas de inventario. Cuando no existen registros en el período, la pantalla lo indica sin sustituirlos por datos de ejemplo.
 
 ## 4. Productos y categorías
 
@@ -36,7 +36,7 @@ Explicar alertas de bajo stock, movimientos, ajustes con motivo e historial.
 
 ## 9. Reportes
 
-Explicar los filtros, período, métricas y limitaciones.
+Administrador puede filtrar por fechas para consultar ventas por día, productos más vendidos y variaciones agregadas de inventario. Los gráficos y tablas se muestran desde la respuesta del servidor; si el período no tiene actividad, la pantalla informa que no hay datos.
 
 ## 10. Mensajes frecuentes
 
@@ -61,3 +61,7 @@ Abre Detalle para revisar sus lineas. Cuando la mercancia haya llegado, usa Reci
 ## 13. Ventas disponibles
 
 En Ventas, escribe al menos dos caracteres para buscar un producto activo y agrégalo al carrito. Define cantidad y método de pago, y confirma. El navegador envía solo identificador de producto, cantidad y método de pago; el servidor obtiene el precio válido, comprueba stock y calcula importes. Una venta concurrente que consuma las últimas unidades puede responder con un conflicto; revisa el carrito y vuelve a consultar el catálogo. El historial se filtra por número y fechas; Administrador también puede filtrar por ID de empleado. El detalle permite volver a abrir o imprimir el comprobante. Empleado ve sus propias ventas; Administrador puede consultar el historial global. EncargadoAlmacen no tiene acceso a este módulo. La fecha del comprobante se muestra según la zona horaria local del navegador y se almacena en UTC.
+
+## 14. Usuarios y auditoría disponibles
+
+Solo Administrador ve estas opciones. En Usuarios puede crear cuentas, elegir uno de los tres roles permitidos y buscar/paginar el directorio. Identity valida y administra las contraseñas; la lista muestra si Identity informa una cuenta bloqueada. Auditoría permite filtrar registros por acción o entidad, usuario y fechas; abre el detalle JSON para revisar la referencia registrada.

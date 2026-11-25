@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createProduct, deactivateProduct, getCategories, getProducts, updateProduct, type Product, type ProductWrite } from '../api/catalog'
 import { getApiErrorMessage } from '../api/httpClient'
-import { hasCatalogManagementRole } from '../auth/RequireRoles'
+import { hasCatalogManagementRole } from '../auth/roleRules'
 import { useAuth } from '../auth/AuthContext'
 
 export function ProductsPage() {
@@ -15,6 +15,7 @@ export function ProductsPage() {
   const [page, setPage] = useState(1)
   const [editing, setEditing] = useState<Product | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const query = useQuery({
     queryKey: ['products', search, activeFilter, categoryId, page],
     queryFn: () => getProducts({ search, isActive: activeFilter === '' ? undefined : activeFilter === 'true', categoryId: categoryId ? Number(categoryId) : undefined, page, pageSize: 10 }),
@@ -30,6 +31,7 @@ export function ProductsPage() {
         queryClient.invalidateQueries({ queryKey: ['products'] }),
         queryClient.invalidateQueries({ queryKey: ['inventory'] }),
       ])
+      setSuccessMessage(editing ? 'Producto actualizado.' : 'Producto creado.')
       setFormOpen(false)
       setEditing(null)
     },
@@ -39,6 +41,7 @@ export function ProductsPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['products'] })
       await queryClient.invalidateQueries({ queryKey: ['inventory'] })
+      setSuccessMessage('Producto desactivado.')
     },
   })
 
@@ -60,6 +63,7 @@ export function ProductsPage() {
   function openNewForm() {
     setEditing(null)
     setFormOpen(true)
+    setSuccessMessage('')
     saveMutation.reset()
   }
 
@@ -69,6 +73,7 @@ export function ProductsPage() {
         <div><p className="eyebrow">Catálogo</p><h1>Productos</h1><p className="page-description">Busca productos por nombre o SKU y consulta sus precios y existencias.</p></div>
         {canManage && <button className="primary-button" type="button" onClick={openNewForm}>Nuevo producto</button>}
       </div>
+      {successMessage && <p className="form-success" role="status">{successMessage}</p>}
 
       {formOpen && canManage && <form className="catalog-form" key={editing?.productId ?? 'new'} onSubmit={submit}>
         <div className="form-heading"><h2>{editing ? 'Editar producto' : 'Crear producto'}</h2><button className="text-button" type="button" onClick={() => setFormOpen(false)}>Cerrar</button></div>
@@ -100,7 +105,7 @@ export function ProductsPage() {
             : <div className="table-wrap"><table className="catalog-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Precio venta</th><th>Existencia</th><th>Estado</th>{canManage && <th>Acciones</th>}</tr></thead><tbody>
               {query.data.items.map((product) => <tr key={product.productId}>
                 <td><strong>{product.name}</strong><small>SKU {product.sku}</small></td><td>{product.categoryName}</td><td>RD$ {product.salePrice.toFixed(2)}</td><td><span className={product.currentStock <= product.minimumStock ? 'stock-low' : ''}>{product.currentStock}</span><small>Mínimo {product.minimumStock}</small></td><td><span className={`status-pill ${product.isActive ? 'active' : 'inactive'}`}>{product.isActive ? 'Activo' : 'Inactivo'}</span></td>
-                {canManage && <td className="row-actions"><button className="text-button" type="button" onClick={() => { setEditing(product); setFormOpen(true); saveMutation.reset() }}>Editar</button>{product.isActive && <button className="text-button danger-text" type="button" disabled={deactivateMutation.isPending} onClick={() => deactivateMutation.mutate(product.productId)}>Desactivar</button>}</td>}
+                {canManage && <td className="row-actions"><button className="text-button" type="button" onClick={() => { setEditing(product); setFormOpen(true); setSuccessMessage(''); saveMutation.reset() }}>Editar</button>{product.isActive && <button className="text-button danger-text" type="button" disabled={deactivateMutation.isPending} onClick={() => deactivateMutation.mutate(product.productId)}>Desactivar</button>}</td>}
               </tr>)}
             </tbody></table></div>}
       {deactivateMutation.isError && <p className="form-error" role="alert">{getApiErrorMessage(deactivateMutation.error)}</p>}

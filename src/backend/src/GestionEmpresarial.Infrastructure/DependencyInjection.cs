@@ -5,6 +5,8 @@ using GestionEmpresarial.Application.Purchases;
 using GestionEmpresarial.Infrastructure.Purchases;
 using GestionEmpresarial.Application.Sales;
 using GestionEmpresarial.Infrastructure.Sales;
+using GestionEmpresarial.Application.Management;
+using GestionEmpresarial.Infrastructure.Management;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<ICatalogService, CatalogService>();
         services.AddScoped<IPurchaseService, PurchaseService>();
         services.AddScoped<ISaleService, SaleService>();
+        services.AddScoped<IManagementQueryService, ManagementQueryService>();
         services
             .AddIdentity<IdentityUser, IdentityRole>(options =>
             {

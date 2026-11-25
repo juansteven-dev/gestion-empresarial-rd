@@ -1,5 +1,6 @@
 using GestionEmpresarial.Api.Authorization;
 using GestionEmpresarial.Api.Contracts;
+using GestionEmpresarial.Application.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +10,16 @@ namespace GestionEmpresarial.Api.Controllers;
 [ApiController]
 [Authorize(Roles = RoleNames.Administrator)]
 [Route("api/v1/users")]
-public sealed class UsersController(UserManager<IdentityUser> userManager) : ControllerBase
+public sealed class UsersController(
+    UserManager<IdentityUser> userManager,
+    IManagementQueryService managementQueryService) : ControllerBase
 {
+    [HttpGet]
+    public async Task<ActionResult<ManagementPageResult<UserDirectoryDto>>> Get(
+        [FromQuery] UserDirectoryQuery query,
+        CancellationToken cancellationToken) =>
+        Ok(await managementQueryService.GetUsersAsync(query, cancellationToken));
+
     [HttpPost]
     public async Task<ActionResult<UserSessionResponse>> Create(CreateUserRequest request)
     {

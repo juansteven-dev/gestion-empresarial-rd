@@ -10,6 +10,7 @@ export function SuppliersPage() {
   const [page, setPage] = useState(1)
   const [editing, setEditing] = useState<Supplier | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const query = useQuery({
     queryKey: ['suppliers', search, activeFilter, page],
     queryFn: () => getSuppliers({ search, isActive: activeFilter === '' ? undefined : activeFilter === 'true', page, pageSize: 10 }),
@@ -19,13 +20,17 @@ export function SuppliersPage() {
       editing ? updateSupplier(editing.supplierId, values) : createSupplier(values),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+      setSuccessMessage(editing ? 'Suplidor actualizado.' : 'Suplidor creado.')
       setFormOpen(false)
       setEditing(null)
     },
   })
   const deactivateMutation = useMutation({
     mutationFn: deactivateSupplier,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['suppliers'] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+      setSuccessMessage('Suplidor desactivado.')
+    },
   })
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -45,8 +50,9 @@ export function SuppliersPage() {
     <section className="catalog-page">
       <div className="page-heading">
         <div><p className="eyebrow">Abastecimiento</p><h1>Suplidores</h1><p className="page-description">Mantén la información de contacto y desactiva los suplidores que ya no estén activos.</p></div>
-        <button className="primary-button" type="button" onClick={() => { setEditing(null); setFormOpen(true); saveMutation.reset() }}>Nuevo suplidor</button>
+        <button className="primary-button" type="button" onClick={() => { setEditing(null); setFormOpen(true); saveMutation.reset(); setSuccessMessage('') }}>Nuevo suplidor</button>
       </div>
+      {successMessage && <p className="form-success" role="status">{successMessage}</p>}
 
       {formOpen && <form className="catalog-form" key={editing?.supplierId ?? 'new'} onSubmit={submit}>
         <div className="form-heading"><h2>{editing ? 'Editar suplidor' : 'Crear suplidor'}</h2><button className="text-button" type="button" onClick={() => setFormOpen(false)}>Cerrar</button></div>
@@ -73,7 +79,7 @@ export function SuppliersPage() {
             : <div className="table-wrap"><table className="catalog-table"><thead><tr><th>Suplidor</th><th>Identificación</th><th>Contacto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
               {query.data.items.map((supplier) => <tr key={supplier.supplierId}>
                 <td><strong>{supplier.name}</strong><small>{supplier.address || 'Sin dirección registrada'}</small></td><td>{supplier.taxId || '—'}</td><td>{supplier.email || '—'}<small>{supplier.phone || 'Sin teléfono'}</small></td><td><span className={`status-pill ${supplier.isActive ? 'active' : 'inactive'}`}>{supplier.isActive ? 'Activo' : 'Inactivo'}</span></td>
-                <td className="row-actions"><button className="text-button" type="button" onClick={() => { setEditing(supplier); setFormOpen(true); saveMutation.reset() }}>Editar</button>{supplier.isActive && <button className="text-button danger-text" type="button" disabled={deactivateMutation.isPending} onClick={() => deactivateMutation.mutate(supplier.supplierId)}>Desactivar</button>}</td>
+                <td className="row-actions"><button className="text-button" type="button" onClick={() => { setEditing(supplier); setFormOpen(true); saveMutation.reset(); setSuccessMessage('') }}>Editar</button>{supplier.isActive && <button className="text-button danger-text" type="button" disabled={deactivateMutation.isPending} onClick={() => deactivateMutation.mutate(supplier.supplierId)}>Desactivar</button>}</td>
               </tr>)}
             </tbody></table></div>}
       {deactivateMutation.isError && <p className="form-error" role="alert">{getApiErrorMessage(deactivateMutation.error)}</p>}

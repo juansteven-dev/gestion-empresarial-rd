@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { getApiErrorMessage } from '../api/httpClient'
 import { useAuth } from '../auth/AuthContext'
-import { catalogManagerRoles, salesRoles } from '../auth/RequireRoles'
+import { administratorRoles, catalogManagerRoles, salesRoles } from '../auth/roleRules'
 
 const navigationItems: { to: string; label: string; end?: boolean; roles?: string[] }[] = [
   { to: '/dashboard', label: 'Resumen', end: true },
@@ -12,6 +12,9 @@ const navigationItems: { to: string; label: string; end?: boolean; roles?: strin
   { to: '/inventory', label: 'Inventario', roles: catalogManagerRoles },
   { to: '/purchases', label: 'Compras', roles: catalogManagerRoles },
   { to: '/sales', label: 'Ventas', roles: salesRoles },
+  { to: '/reports', label: 'Reportes', roles: administratorRoles },
+  { to: '/users', label: 'Usuarios', roles: administratorRoles },
+  { to: '/audit', label: 'Auditoría', roles: administratorRoles },
 ]
 
 export function AppLayout() {
@@ -71,7 +74,7 @@ export function AppLayout() {
           </div>
           <div className="topbar-actions">
             {logoutError && <p className="logout-error" role="alert">{logoutError}</p>}
-            <span className="topbar-user">{user?.userName}</span>
+            <span className="topbar-identity"><span className="topbar-user">{user?.userName}</span><small>{user?.roles.join(' · ')}</small></span>
             <button className="logout-button" type="button" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? 'Saliendo…' : 'Cerrar sesión'}
             </button>

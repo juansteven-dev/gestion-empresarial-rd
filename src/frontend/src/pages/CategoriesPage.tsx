@@ -10,6 +10,7 @@ export function CategoriesPage() {
   const [page, setPage] = useState(1)
   const [editing, setEditing] = useState<Category | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const query = useQuery({
     queryKey: ['categories', search, activeFilter, page],
     queryFn: () => getCategories({ search, isActive: activeFilter === '' ? undefined : activeFilter === 'true', page, pageSize: 10 }),
@@ -19,13 +20,17 @@ export function CategoriesPage() {
       editing ? updateCategory(editing.categoryId, values) : createCategory(values),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['categories'] })
+      setSuccessMessage(editing ? 'Categoría actualizada.' : 'Categoría creada.')
       setFormOpen(false)
       setEditing(null)
     },
   })
   const deactivateMutation = useMutation({
     mutationFn: deactivateCategory,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['categories'] })
+      setSuccessMessage('Categoría desactivada.')
+    },
   })
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -41,6 +46,7 @@ export function CategoriesPage() {
   function openNewForm() {
     setEditing(null)
     setFormOpen(true)
+    setSuccessMessage('')
     saveMutation.reset()
   }
 
@@ -54,6 +60,7 @@ export function CategoriesPage() {
         </div>
         <button className="primary-button" type="button" onClick={openNewForm}>Nueva categoría</button>
       </div>
+      {successMessage && <p className="form-success" role="status">{successMessage}</p>}
 
       {formOpen && (
         <form className="catalog-form" key={editing?.categoryId ?? 'new'} onSubmit={submit}>
@@ -79,7 +86,7 @@ export function CategoriesPage() {
             : <div className="table-wrap"><table className="catalog-table"><thead><tr><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
               {query.data.items.map((category) => <tr key={category.categoryId}>
                 <td>{category.name}</td><td>{category.description || '—'}</td><td><span className={`status-pill ${category.isActive ? 'active' : 'inactive'}`}>{category.isActive ? 'Activa' : 'Inactiva'}</span></td>
-                <td className="row-actions"><button className="text-button" type="button" onClick={() => { setEditing(category); setFormOpen(true); saveMutation.reset() }}>Editar</button>{category.isActive && <button className="text-button danger-text" type="button" disabled={deactivateMutation.isPending} onClick={() => deactivateMutation.mutate(category.categoryId)}>Desactivar</button>}</td>
+                <td className="row-actions"><button className="text-button" type="button" onClick={() => { setEditing(category); setFormOpen(true); setSuccessMessage(''); saveMutation.reset() }}>Editar</button>{category.isActive && <button className="text-button danger-text" type="button" disabled={deactivateMutation.isPending} onClick={() => deactivateMutation.mutate(category.categoryId)}>Desactivar</button>}</td>
               </tr>)}
             </tbody></table></div>}
       {deactivateMutation.isError && <p className="form-error" role="alert">{getApiErrorMessage(deactivateMutation.error)}</p>}

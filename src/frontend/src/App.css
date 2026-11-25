@@ -149,6 +149,17 @@
   font-weight: 600;
 }
 
+.topbar-identity {
+  display: grid;
+  gap: 3px;
+  justify-items: end;
+}
+
+.topbar-identity small {
+  color: #71817b;
+  font-size: 10px;
+}
+
 .logout-button {
   padding: 9px 13px;
   border: 1px solid #d6e2dc;
@@ -299,20 +310,9 @@
   padding: clamp(28px, 5vw, 58px);
 }
 
-.placeholder-page {
-  max-width: 760px;
-}
-
 .eyebrow {
   margin: 0 0 12px;
   color: #4d806f;
-}
-
-.placeholder-page h1 {
-  margin: 0;
-  color: #1c302a;
-  font-size: clamp(28px, 4vw, 38px);
-  letter-spacing: -0.035em;
 }
 
 .page-description {
@@ -321,31 +321,6 @@
   color: #61716c;
   font-size: 15px;
   line-height: 1.65;
-}
-
-.placeholder-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 17px 18px;
-  border: 1px solid #dce8e2;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgb(26 61 50 / 4%);
-}
-
-.placeholder-card p {
-  margin: 0;
-  color: #596a64;
-  font-size: 14px;
-}
-
-.placeholder-dot {
-  width: 9px;
-  height: 9px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: #66a28a;
 }
 
 .catalog-page {
@@ -918,7 +893,115 @@
   font-size: 15px;
 }
 
+.analytics-period {
+  align-items: end;
+}
+
+.analytics-period label {
+  display: grid;
+  min-width: 170px;
+  gap: 6px;
+  color: #52665f;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.analytics-period input {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #cedbd4;
+  border-radius: 7px;
+  color: #263b35;
+  background: #fff;
+  font: inherit;
+}
+
+.analytics-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.analytics-card,
+.analytics-panel {
+  padding: 18px;
+  border: 1px solid #dce8e2;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(26 61 50 / 4%);
+}
+
+.analytics-card {
+  display: grid;
+  gap: 8px;
+}
+
+.analytics-card span,
+.analytics-card small {
+  color: #71817b;
+  font-size: 12px;
+}
+
+.analytics-card strong {
+  color: #1c302a;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+}
+
+.analytics-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.analytics-count {
+  margin: 0;
+  color: #52665f;
+  font-size: 13px;
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.report-chart {
+  min-width: 0;
+}
+
+.chart-frame {
+  width: 100%;
+  height: 300px;
+  min-width: 0;
+}
+
+.audit-details {
+  max-width: min(400px, 45vw);
+  max-height: 180px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 6px;
+  color: #344a42;
+  background: #f5f8f6;
+  font-size: 11px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 720px) {
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-details {
+    max-width: 65vw;
+  }
+
+  .topbar-identity small {
+    max-width: 140px;
+    text-align: right;
+  }
+
   .sales-layout {
     grid-template-columns: 1fr;
   }

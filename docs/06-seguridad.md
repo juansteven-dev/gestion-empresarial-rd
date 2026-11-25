@@ -41,10 +41,13 @@ Si el equipo decide utilizar JWT en vez de cookies, documentar expiración corta
 | Crear/recibir compras | Sí | No | Sí |
 | Registrar ventas | Sí | Sí | Opcional (definir política final) |
 | Ajustar inventario | Sí | No | Sí |
-| Ver dashboard/reportes | Sí | No* | Sí (inventario) |
+| Dashboard por rol | Sí | Sí (ventas propias) | Sí (inventario) |
+| Reportes globales | Sí | No | No |
 | Consultar auditoría | Sí | No | No |
 
 *El alcance mínimo del proyecto limita reportes globales al Administrador; se puede decidir permitir reportes de inventario al Encargado.
+
+El dashboard aplica alcance de datos en servidor: Administrador ve métricas globales, Empleado solo sus ventas y EncargadoAlmacen alertas de inventario. `/api/v1/reports`, `/api/v1/users` y `/api/v1/audit` exigen el rol Administrador.
 
 ## 8.5 Registro de auditoría
 
