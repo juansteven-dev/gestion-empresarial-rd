@@ -9,6 +9,7 @@
 - Soft delete (`IsActive`) para catálogos que pueden estar referenciados históricamente.
 - No borrar ventas ni compras recibidas.
 - La seguridad/identidad se implementa con ASP.NET Core Identity y sus tablas `AspNetUsers`, `AspNetRoles`, etc. Las columnas `CreatedByUserId`/`UserId` almacenan el identificador de Identity.
+- Los diagramas de este documento resumen los campos de negocio; las columnas de soporte, longitudes, índices y checks exactos se definen en las configuraciones EF Core de Infrastructure.
 
 ## 6.2 Entidades
 
@@ -149,4 +150,4 @@ La segunda llamada debe devolver 409 y no duplicar existencias.
 
 ## 6.7 Script
 
-Revisar `database/scripts/01-create-database.sql`. Es un DDL de referencia académica. En el desarrollo real, las migraciones de EF Core deben mantener sincronizados los modelos y el esquema.
+`database/scripts/01-create-database.sql` se conserva únicamente como referencia histórica del starter y no debe ejecutarse. El esquema vigente se define en las entidades y configuraciones EF Core; las migraciones versionan sus cambios. `database/scripts/InitialCreate.sql` es el script de despliegue generado desde esas migraciones con `dotnet ef migrations script`. No editar ese artefacto manualmente: al cambiar el modelo, crear una migración y volver a generarlo.

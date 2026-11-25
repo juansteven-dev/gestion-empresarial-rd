@@ -1,0 +1,6 @@
+@GestionEmpresarial.Api_HostAddress = https://localhost:7024
+
+GET {{GestionEmpresarial.Api_HostAddress}}/health
+Accept: text/plain
+
+###

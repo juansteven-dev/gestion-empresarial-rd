@@ -1,8 +1,8 @@
 /*
-  Gestión Empresarial RD - esquema de negocio para SQL Server.
-  Nota: ASP.NET Core Identity administra sus propias tablas AspNet* mediante EF Core.
-  Ejecutar sobre una instancia de SQL Server con permisos para crear bases de datos.
-  Para el esquema de ejecución del proyecto, preferir migraciones EF Core como fuente de verdad.
+  REFERENCIA HISTORICA DEL STARTER — NO EJECUTAR.
+  Este DDL antecede al modelo EF Core vigente y contiene diferencias de esquema.
+  La fuente de verdad es el modelo/configuración EF Core y sus migraciones.
+  El script de despliegue sincronizado se genera en database/scripts/InitialCreate.sql.
 */
 IF DB_ID(N'GestionEmpresarialRD') IS NULL
 BEGIN

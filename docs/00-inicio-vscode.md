@@ -28,11 +28,11 @@ dotnet new classlib -n GestionEmpresarial.Infrastructure -o src/GestionEmpresari
 dotnet new webapi -n GestionEmpresarial.Api -o src/GestionEmpresarial.Api -f net10.0 --use-controllers
 dotnet new xunit -n GestionEmpresarial.UnitTests -o tests/GestionEmpresarial.UnitTests -f net10.0
 
-dotnet sln add src/GestionEmpresarial.Domain/GestionEmpresarial.Domain.csproj
-dotnet sln add src/GestionEmpresarial.Application/GestionEmpresarial.Application.csproj
-dotnet sln add src/GestionEmpresarial.Infrastructure/GestionEmpresarial.Infrastructure.csproj
-dotnet sln add src/GestionEmpresarial.Api/GestionEmpresarial.Api.csproj
-dotnet sln add tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj
+dotnet sln GestionEmpresarial.slnx add src/GestionEmpresarial.Domain/GestionEmpresarial.Domain.csproj
+dotnet sln GestionEmpresarial.slnx add src/GestionEmpresarial.Application/GestionEmpresarial.Application.csproj
+dotnet sln GestionEmpresarial.slnx add src/GestionEmpresarial.Infrastructure/GestionEmpresarial.Infrastructure.csproj
+dotnet sln GestionEmpresarial.slnx add src/GestionEmpresarial.Api/GestionEmpresarial.Api.csproj
+dotnet sln GestionEmpresarial.slnx add tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj
 
 dotnet add src/GestionEmpresarial.Application reference src/GestionEmpresarial.Domain
 dotnet add src/GestionEmpresarial.Infrastructure reference src/GestionEmpresarial.Domain src/GestionEmpresarial.Application

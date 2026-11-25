@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GestionEmpresarial.Api/GestionEmpresarial.Api.csproj" />
+    <Project Path="src/GestionEmpresarial.Application/GestionEmpresarial.Application.csproj" />
+    <Project Path="src/GestionEmpresarial.Domain/GestionEmpresarial.Domain.csproj" />
+    <Project Path="src/GestionEmpresarial.Infrastructure/GestionEmpresarial.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj" />
+  </Folder>
+</Solution>
