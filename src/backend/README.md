@@ -49,3 +49,14 @@ La API expone DTOs paginados bajo /api/v1. Las categorias y suplidores se admini
 - POST /api/v1/inventory/adjustments: acepta productId, quantityDelta distinto de cero y reason obligatorio. El ajuste que produzca stock negativo devuelve 409. Un ajuste valido persiste producto, movimiento y auditoria en una transaccion.
 
 Toda escritura requiere el token de GET /api/v1/auth/csrf en X-CSRF-TOKEN. dotnet test src/backend/tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj ejecuta las pruebas de autenticacion y catalogos con WebApplicationFactory y EF Core InMemory; estas pruebas no sustituyen una validacion contra SQL Server.
+
+## Compras (Fase C)
+
+Las rutas estan bajo /api/v1/purchases y requieren Administrador o EncargadoAlmacen; las escrituras requieren X-CSRF-TOKEN.
+
+- GET /api/v1/purchases: busqueda por numero/suplidor, filtro opcional por suplidor o estado y paginacion.
+- GET /api/v1/purchases/{id}: detalle del borrador o recepcion.
+- POST /api/v1/purchases: crea Draft con suplidor activo, lineas de producto activo, cantidad y costo unitario. No aumenta stock.
+- POST /api/v1/purchases/{id}/receive: cambia el estado y actualiza stock, movimientos y auditoria atomicamente. Una segunda recepcion devuelve 409.
+
+Las pruebas de API cubren compra vacia, suplidor desconocido, borrador sin movimiento, recepcion, recepcion repetida y ausencia de cambios persistidos cuando falla una linea posterior. El proveedor de pruebas es EF Core InMemory; la transaccion de SQL Server no se ha ejercitado contra una base real.

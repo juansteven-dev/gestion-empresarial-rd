@@ -72,3 +72,9 @@ Cada historia debe convertirse en tareas frontend, backend, persistencia y prueb
 - HU-05 Suplidores: Administrador o EncargadoAlmacen puede buscar, filtrar por estado y desactivar un suplidor conservando sus datos.
 - HU-12 Ajustes: Administrador o EncargadoAlmacen indica producto, variacion y motivo. Una variacion que deje stock negativo se rechaza; una aceptada crea movimiento y auditoria.
 - Los listados de categorias, productos, suplidores, existencias y movimientos usan paginacion del servidor. Las escrituras requieren cookie autenticada y token antifalsificacion.
+
+## 3.6 Ciclo de compras implementado (Fase C)
+
+- HU-06: el encargado crea un borrador con suplidor y lineas. El servidor valida suplidor/productos activos, cantidad y costo; genera el numero y total.
+- HU-07: el borrador conserva stock. Al recibir, el servidor reclama condicionalmente el estado Draft, actualiza existencias, agrega movimientos y auditoria y confirma todo en una transaccion.
+- La recepcion repetida o el cambio concurrente de compra/stock devuelve conflicto sin duplicar inventario.

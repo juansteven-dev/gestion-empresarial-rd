@@ -88,3 +88,11 @@ Los requisitos usan identificadores estables. Cada requisito debe vincularse a u
 - RF-12 y RF-13: el personal autorizado consulta existencias y movimientos; los ajustes exigen motivo y guardan movimiento y auditoria dentro de la misma operacion.
 - Precios, existencia minima y cantidades se validan en servidor. La existencia inicial de un producto es cero y solo cambia mediante movimientos de inventario.
 - La paginacion acepta page y pageSize; el servidor limita pageSize a 100.
+
+## 2.7 Aceptacion de compras (Fase C)
+
+- RF-08: Administrador o EncargadoAlmacen crea una compra Draft con suplidor activo y entre 1 y 100 lineas de productos activos, cantidades positivas y costo unitario no negativo.
+- Guardar el borrador no modifica existencias ni crea movimientos de compra.
+- RF-09: recibir cambia Draft a Received, aumenta el stock por linea, crea un movimiento por linea y registra PurchaseReceived en AuditLogs dentro de una transaccion.
+- Una compra recibida no se puede recibir otra vez; el servidor devuelve 409. Si un producto queda inactivo antes de recibir o falla una actualizacion, no se persisten cambios parciales.
+- El total se calcula en el servidor a partir de cantidad por costo unitario; se limita a decimal(18,2).

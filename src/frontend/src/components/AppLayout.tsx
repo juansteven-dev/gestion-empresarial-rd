@@ -10,7 +10,7 @@ const navigationItems: { to: string; label: string; end?: boolean; roles?: strin
   { to: '/categories', label: 'Categorias', roles: catalogManagerRoles },
   { to: '/suppliers', label: 'Suplidores', roles: catalogManagerRoles },
   { to: '/inventory', label: 'Inventario', roles: catalogManagerRoles },
-  { to: '/purchases', label: 'Compras' },
+  { to: '/purchases', label: 'Compras', roles: catalogManagerRoles },
   { to: '/sales', label: 'Ventas' },
 ]
 

@@ -1,4 +1,4 @@
-using GestionEmpresarial.Application.Catalogs;
+using GestionEmpresarial.Application.Common;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,14 +11,14 @@ public sealed class CatalogExceptionHandler(ILogger<CatalogExceptionHandler> log
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is not CatalogServiceException catalogException)
+        if (exception is not IApplicationServiceException serviceException)
         {
             return false;
         }
 
-        var statusCode = (int)catalogException.StatusCode;
-        logger.LogInformation("Catalog request rejected with code {CatalogErrorCode} and status {StatusCode}.",
-            catalogException.Code,
+        var statusCode = (int)serviceException.StatusCode;
+        logger.LogInformation("Application request rejected with code {ServiceErrorCode} and status {StatusCode}.",
+            serviceException.Code,
             statusCode);
 
         httpContext.Response.StatusCode = statusCode;
@@ -26,12 +26,12 @@ public sealed class CatalogExceptionHandler(ILogger<CatalogExceptionHandler> log
         var problem = new ProblemDetails
         {
             Status = statusCode,
-            Title = catalogException.StatusCode == System.Net.HttpStatusCode.Conflict
+            Title = serviceException.StatusCode == System.Net.HttpStatusCode.Conflict
                 ? "Conflicto con los datos"
                 : "Solicitud inválida",
-            Detail = catalogException.Message
+            Detail = serviceException.Message
         };
-        problem.Extensions["code"] = catalogException.Code;
+        problem.Extensions["code"] = serviceException.Code;
         await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
         return true;
     }

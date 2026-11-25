@@ -1,6 +1,8 @@
 using GestionEmpresarial.Infrastructure.Persistence;
 using GestionEmpresarial.Application.Catalogs;
 using GestionEmpresarial.Infrastructure.Catalogs;
+using GestionEmpresarial.Application.Purchases;
+using GestionEmpresarial.Infrastructure.Purchases;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +27,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
         services.AddScoped<ICatalogService, CatalogService>();
+        services.AddScoped<IPurchaseService, PurchaseService>();
         services
             .AddIdentity<IdentityUser, IdentityRole>(options =>
             {

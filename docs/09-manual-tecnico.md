@@ -65,3 +65,9 @@ Los controladores estan en src/backend/src/GestionEmpresarial.Api/Controllers; s
 Los listados aceptan page y pageSize (1 a 100). Los errores de validacion responden 400 y los conflictos de SKU, categoria o stock responden 409 con Problem Details. Las escrituras requieren antiforgery. La migracion inicial ya contiene el esquema de catalogos e inventario; esta fase no cambio el esquema y no creo otra migracion.
 
 Las pruebas de integracion actuales reemplazan SQL Server por EF Core InMemory. Para validar indices unicos, RowVersion y transacciones relacionales en el entorno local, ejecutar ademas una prueba funcional contra una base SQL Server de desarrollo.
+
+## 11. Endpoints de compras (Fase C)
+
+El controlador PurchasesController aplica autorizacion en servidor a Administrador y EncargadoAlmacen. GET /api/v1/purchases lista compras paginadas y admite search, supplierId, status, page y pageSize. GET /{id} devuelve el detalle. POST /api/v1/purchases crea un borrador; POST /{id}/receive confirma la recepcion. Las escrituras pasan por el filtro antifalsificacion global.
+
+La recepcion abre transaccion, reclama la fila con una actualizacion condicionada a Status Draft, incrementa cada producto, crea StockMovement por linea, marca Received y agrega AuditLog antes de confirmar. La condicion de estado evita que dos solicitudes concurrentes reciban el mismo documento; RowVersion de producto detecta conflictos de stock. Cualquier excepcion antes de confirmar revierte la transaccion en SQL Server. No hubo cambios de esquema porque las tablas y restricciones ya existen en la migracion inicial.

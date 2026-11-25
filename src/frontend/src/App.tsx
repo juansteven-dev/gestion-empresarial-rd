@@ -7,6 +7,7 @@ import { CategoriesPage } from './pages/CategoriesPage'
 import { InventoryPage } from './pages/InventoryPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { PurchasesPage } from './pages/PurchasesPage'
 import { SuppliersPage } from './pages/SuppliersPage'
 import './App.css'
 
@@ -33,17 +34,8 @@ function App() {
               <Route path="categories" element={<CategoriesPage />} />
               <Route path="suppliers" element={<SuppliersPage />} />
               <Route path="inventory" element={<InventoryPage />} />
+              <Route path="purchases" element={<PurchasesPage />} />
             </Route>
-            <Route
-              path="purchases"
-              element={
-                <PlaceholderPage
-                  section="Abastecimiento"
-                  title="Compras"
-                  description="Esta ruta esta preparada para el futuro modulo de compras."
-                />
-              }
-            />
             <Route
               path="sales"
               element={

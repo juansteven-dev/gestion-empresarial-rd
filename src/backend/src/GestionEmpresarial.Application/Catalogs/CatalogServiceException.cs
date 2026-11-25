@@ -1,9 +1,10 @@
 using System.Net;
+using GestionEmpresarial.Application.Common;
 
 namespace GestionEmpresarial.Application.Catalogs;
 
 public sealed class CatalogServiceException(HttpStatusCode statusCode, string code, string message)
-    : Exception(message)
+    : Exception(message), IApplicationServiceException
 {
     public HttpStatusCode StatusCode { get; } = statusCode;
     public string Code { get; } = code;

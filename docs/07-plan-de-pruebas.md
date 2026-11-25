@@ -78,3 +78,10 @@ CatalogEndpointTests usa WebApplicationFactory y cubre paginacion de categorias;
 - dotnet test src/backend/tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj --no-restore --logger "console;verbosity=minimal": 19 pruebas aprobadas, 0 fallidas y 0 omitidas. VSTest informo que VSTEST_ARTIFACTS_DIRECTORY no esta definida y uso un directorio temporal.
 - npm.cmd run build (desde src/frontend): compilacion TypeScript y Vite correctas; 139 modulos transformados.
 - La suite de API usa EF Core InMemory. No se ejecuto una prueba contra SQL Server real en esta fase.
+
+## 10.9 Verificacion de la Fase C (2026-11-25)
+
+- dotnet build src/backend/GestionEmpresarial.slnx --no-restore: compilacion correcta; 0 advertencias y 0 errores.
+- dotnet test src/backend/tests/GestionEmpresarial.UnitTests/GestionEmpresarial.UnitTests.csproj --no-restore --logger "console;verbosity=minimal": 24 aprobadas, 0 fallidas y 0 omitidas. VSTest uso una carpeta temporal porque VSTEST_ARTIFACTS_DIRECTORY no esta definida.
+- npm.cmd run build desde src/frontend: compilacion TypeScript y Vite correctas; 141 modulos transformados.
+- Las pruebas de integracion usan EF Core InMemory y comprueban que un error en una linea posterior no deje cambios parciales persistidos. No ejercitan el rollback relacional de SQL Server; esa comprobacion queda pendiente de ejecutarse contra la base local.

@@ -51,3 +51,9 @@ En Productos, escribe parte del nombre o SKU, filtra por categoria o estado y us
 En Categorias, crea y edita nombre/descripcion. Si una categoria todavia tiene productos activos, primero desactiva esos productos; asi no queda un producto activo en una categoria inactiva. En Suplidores, se pueden mantener identificacion, telefono, correo, direccion y estado; desactivar conserva el registro.
 
 En Inventario, consulta el conteo y la lista de productos cuyo stock esta en el minimo o por debajo. Para ajustar, selecciona el producto, indica una cantidad positiva para sumar o negativa para restar, y escribe el motivo. El sistema rechaza una operacion que deje stock negativo. Los movimientos muestran variacion, balance antes/despues, motivo y fecha; los ajustes aceptados tambien quedan auditados.
+
+## 12. Compras disponibles
+
+Administrador y EncargadoAlmacen pueden abrir Compras. Usa Nueva compra, selecciona un suplidor activo y agrega una o mas lineas con producto, cantidad y costo unitario. Guardar borrador genera el numero de compra y muestra el documento en la lista; el stock no cambia en ese momento.
+
+Abre Detalle para revisar sus lineas. Cuando la mercancia haya llegado, usa Recibir. La operacion cambia el estado a Recibida, incrementa existencias y queda en el historial de movimientos y auditoria. El boton solo aparece para borradores; si una compra ya fue recibida, otra solicitud se rechaza.

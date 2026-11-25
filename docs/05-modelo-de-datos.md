@@ -157,3 +157,7 @@ La segunda llamada debe devolver 409 y no duplicar existencias.
 Categories, Products, Suppliers, StockMovements y AuditLogs ya estan incluidos en la migracion inicial. SKU tiene indice unico; precios, minimos y balance tienen restricciones no negativas. El producto comienza con stock cero. Las ediciones de nombre/precio no alteran el balance; los ajustes registran balance anterior, variacion, balance posterior, motivo, actor y fecha UTC junto con un AuditLog.
 
 La API desactiva categorias, productos y suplidores mediante IsActive; no elimina fisicamente los registros. Una categoria con productos activos no se puede desactivar hasta desactivar esos productos. La Fase B no anade columnas ni tablas, por lo que no requiere una migracion nueva.
+
+## 6.9 Compras implementadas
+
+La migracion inicial ya contiene Purchases y PurchaseItems con relaciones restrictivas, estado, fecha de recepcion y valores monetarios decimal(18,2). Crear el borrador guarda la compra y sus lineas sin tocar Products.CurrentStock ni StockMovements. Recibir usa una transaccion, registra un movimiento por linea con ReferenceType Purchase y ReferenceId de la compra, y agrega el evento PurchaseReceived a AuditLogs. Esta fase no cambia el esquema ni requiere una migracion adicional.
