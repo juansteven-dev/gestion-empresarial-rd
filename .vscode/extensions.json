@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "ms-dotnettools.csdevkit",
+    "ms-dotnettools.csharp",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-mssql.mssql",
+    "eamodio.gitlens",
+    "bierner.markdown-mermaid"
+  ]
+}

@@ -1,0 +1,27 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+*.cache
+TestResults/
+
+# Node / Vite
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+**/secrets.json
+
+# Editors / OS
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Evidence: keep folder but not temporary exports
