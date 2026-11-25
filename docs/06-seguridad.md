@@ -71,3 +71,6 @@ Restauración de demostración en otra base o instancia siguiendo las restriccio
 - [ ] Errores no revelan stack traces.
 - [ ] Auditoría registra las acciones críticas.
 - [ ] Backup restaurado al menos una vez.
+## 8.8 Configuración implementada en la fase A
+
+La API implementa login, logout y consulta de sesión en `/api/v1/auth`; `GET /api/v1/auth/csrf` entrega el token que el cliente envía como `X-CSRF-TOKEN` en operaciones de escritura. La creación de cuentas está protegida por el rol `Administrador` en el servidor y no existe registro público. Los únicos roles válidos son `Administrador`, `Empleado` y `EncargadoAlmacen`. Las instrucciones locales para crear el primer administrador y retirar esos secretos después están en `src/backend/README.md`.

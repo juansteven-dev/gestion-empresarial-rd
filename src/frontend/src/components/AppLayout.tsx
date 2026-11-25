@@ -1,4 +1,7 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { getApiErrorMessage } from '../api/httpClient'
+import { useAuth } from '../auth/AuthContext'
 
 const navigationItems = [
   { to: '/dashboard', label: 'Resumen', end: true },
@@ -8,6 +11,25 @@ const navigationItems = [
 ]
 
 export function AppLayout() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+  const [logoutError, setLogoutError] = useState('')
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  async function handleLogout() {
+    setLogoutError('')
+    setIsLoggingOut(true)
+
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch (error) {
+      setLogoutError(getApiErrorMessage(error))
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -40,7 +62,13 @@ export function AppLayout() {
             <p className="topbar-label">ESPACIO DE TRABAJO</p>
             <p className="topbar-title">Operación local</p>
           </div>
-          <NavLink className="login-link" to="/login">Iniciar sesión</NavLink>
+          <div className="topbar-actions">
+            {logoutError && <p className="logout-error" role="alert">{logoutError}</p>}
+            <span className="topbar-user">{user?.userName}</span>
+            <button className="logout-button" type="button" onClick={handleLogout} disabled={isLoggingOut}>
+              {isLoggingOut ? 'Saliendo…' : 'Cerrar sesión'}
+            </button>
+          </div>
         </header>
 
         <main className="page-content">

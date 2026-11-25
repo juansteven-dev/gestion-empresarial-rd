@@ -18,3 +18,22 @@ La solución ya está creada. No vuelvas a generar los proyectos; sigue la arqui
 Desde la raíz del repositorio, ejecuta el API con `dotnet run --project src/backend/src/GestionEmpresarial.Api --launch-profile https` y el frontend con `npm.cmd run dev` desde `src/frontend`.
 
 El API lee `ConnectionStrings:DefaultConnection` desde configuración. En desarrollo, .NET carga User Secrets; en otros entornos puede usarse `ConnectionStrings__DefaultConnection`. No agregues la cadena a `appsettings.json` ni a otro archivo versionado. User Secrets ya está inicializado para el proyecto.
+## Autenticación y primer administrador
+
+El API usa ASP.NET Core Identity y cookies de sesión `HttpOnly`, `Secure` y `SameSite=Lax` con expiración de ocho horas. El navegador solicita `GET /api/v1/auth/csrf` y envía el token recibido en `X-CSRF-TOKEN` para cada operación de escritura. Los endpoints son `POST /api/v1/auth/login`, `POST /api/v1/auth/logout` y `GET /api/v1/auth/me`. No hay registro público. `POST /api/v1/users` crea cuentas y exige el rol `Administrador`; solo acepta `Administrador`, `Empleado` o `EncargadoAlmacen`.
+
+Para crear el primer administrador local, configura los secretos desde la raíz del repositorio. Sustituye los valores de ejemplo; no los guardes en archivos versionados:
+
+```powershell
+dotnet user-secrets set --project src/backend/src/GestionEmpresarial.Api "BootstrapAdmin:UserName" "TU_USUARIO_LOCAL"
+dotnet user-secrets set --project src/backend/src/GestionEmpresarial.Api "BootstrapAdmin:Email" "TU_CORREO_LOCAL"
+dotnet user-secrets set --project src/backend/src/GestionEmpresarial.Api "BootstrapAdmin:Password" "TU_CLAVE_SEGURA"
+dotnet run --project src/backend/src/GestionEmpresarial.Api --launch-profile https -- --bootstrap-admin
+dotnet user-secrets remove --project src/backend/src/GestionEmpresarial.Api "BootstrapAdmin:Password"
+dotnet user-secrets remove --project src/backend/src/GestionEmpresarial.Api "BootstrapAdmin:UserName"
+dotnet user-secrets remove --project src/backend/src/GestionEmpresarial.Api "BootstrapAdmin:Email"
+```
+
+El arranque normal crea los tres roles de forma idempotente. El comando `--bootstrap-admin` solo crea una cuenta si todavía no existe un administrador; no restablece contraseñas. Identity aplica una clave de al menos 12 caracteres y bloquea la cuenta durante 15 minutos después de cinco intentos fallidos.
+
+Las pruebas de autenticación se ejecutan con `dotnet test src/backend/GestionEmpresarial.slnx`.
