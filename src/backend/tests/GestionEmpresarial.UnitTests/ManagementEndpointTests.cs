@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using GestionEmpresarial.Api.Authorization;
+using GestionEmpresarial.Domain.Entities;
 
 namespace GestionEmpresarial.UnitTests;
 
@@ -26,6 +27,8 @@ public sealed class ManagementEndpointTests(ApiFactory factory)
             administrator.CsrfToken,
             new { PaymentMethod = 0, Items = new[] { new { ProductId = productId, Quantity = 1 } } });
         Assert.Equal(HttpStatusCode.Created, saleResponse.StatusCode);
+        var createdSale = await saleResponse.Content.ReadFromJsonAsync<CreatedSaleResponse>(JsonOptions);
+        Assert.NotNull(createdSale);
 
         var date = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
         using var dashboardResponse = await administrator.Client.GetAsync($"/api/v1/dashboard?fromDate={date}&toDate={date}");
@@ -35,15 +38,48 @@ public sealed class ManagementEndpointTests(ApiFactory factory)
         Assert.NotNull(dashboard);
         Assert.True(dashboard.SaleCount >= 1);
         Assert.True(dashboard.SalesTotal >= 12.34m);
+        Assert.True(dashboard.TodaySaleCount >= 1);
+        Assert.True(dashboard.TodaySalesTotal >= 12.34m);
         Assert.Contains(dashboard.LowStockProducts, product => product.SKU == sku);
 
         using var reportsResponse = await administrator.Client.GetAsync($"/api/v1/reports?fromDate={date}&toDate={date}");
         Assert.Equal(HttpStatusCode.OK, reportsResponse.StatusCode);
         var reports = await reportsResponse.Content.ReadFromJsonAsync<ReportsResponse>(JsonOptions);
         Assert.NotNull(reports);
+        Assert.Equal(reports.SaleCount, reports.SalesByDay.Sum(item => item.SaleCount));
+        Assert.Equal(reports.SalesTotal, reports.SalesByDay.Sum(item => item.Total));
         Assert.Contains(reports.SalesByDay, item => item.SaleCount >= 1 && item.Total >= 12.34m);
         Assert.Contains(reports.TopProducts, item => item.SKU == sku && item.Quantity == 1);
         Assert.Contains(reports.Movements, item => item.Type == 1 && item.MovementCount >= 1);
+
+        using var salesPageResponse = await administrator.Client.GetAsync(
+            $"/api/v1/sales?search={Uri.EscapeDataString(createdSale.SaleNumber)}&fromDate={date}&toDate={date}&page=1&pageSize=1");
+        Assert.Equal(HttpStatusCode.OK, salesPageResponse.StatusCode);
+        var salesPage = await salesPageResponse.Content.ReadFromJsonAsync<PageResponse<SaleRowResponse>>(JsonOptions);
+        Assert.NotNull(salesPage);
+        var listedSale = Assert.Single(salesPage.Items);
+        Assert.Equal(createdSale.SaleId, listedSale.SaleId);
+        Assert.Equal(createdSale.Total, listedSale.Total);
+
+        var fromUtc = Uri.EscapeDataString($"{date}T00:00:00.0000000Z");
+        var toUtc = Uri.EscapeDataString($"{date}T23:59:59.9999999Z");
+        using var movementResponse = await administrator.Client.GetAsync(
+            $"/api/v1/inventory/movements?productId={productId}&fromUtc={fromUtc}&toUtc={toUtc}&page=1&pageSize=1");
+        Assert.Equal(HttpStatusCode.OK, movementResponse.StatusCode);
+        var movementPage = await movementResponse.Content.ReadFromJsonAsync<PageResponse<MovementRowResponse>>(JsonOptions);
+        Assert.NotNull(movementPage);
+        Assert.True(movementPage.TotalCount >= 2);
+        Assert.All(movementPage.Items, item => Assert.Equal(productId, item.ProductId));
+        Assert.Single(movementPage.Items);
+
+        var oldDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-500).ToString("yyyy-MM-dd");
+        using var oldPeriodResponse = await administrator.Client.GetAsync($"/api/v1/reports?fromDate={oldDate}&toDate={oldDate}");
+        Assert.Equal(HttpStatusCode.OK, oldPeriodResponse.StatusCode);
+        var oldPeriod = await oldPeriodResponse.Content.ReadFromJsonAsync<ReportsResponse>(JsonOptions);
+        Assert.NotNull(oldPeriod);
+        Assert.Equal(0, oldPeriod.SaleCount);
+        Assert.Equal(0m, oldPeriod.SalesTotal);
+        Assert.Empty(oldPeriod.SalesByDay);
 
         var account = await factory.CreateUserAsync(RoleNames.Employee);
         using var usersResponse = await administrator.Client.GetAsync($"/api/v1/users?search={Uri.EscapeDataString(account.UserName)}&page=1&pageSize=10");
@@ -72,6 +108,7 @@ public sealed class ManagementEndpointTests(ApiFactory factory)
         var dashboard = await dashboardResponse.Content.ReadFromJsonAsync<DashboardResponse>(JsonOptions);
         Assert.NotNull(dashboard);
         Assert.Null(dashboard.LowStockCount);
+        Assert.Equal(0, dashboard.TodaySaleCount);
 
         using var reportsResponse = await employee.Client.GetAsync("/api/v1/reports");
         using var usersResponse = await employee.Client.GetAsync("/api/v1/users");
@@ -168,13 +205,56 @@ public sealed class ManagementEndpointTests(ApiFactory factory)
     private sealed record CsrfResponse(string RequestToken);
     private sealed record CategoryResponse(int CategoryId);
     private sealed record ProductResponse(int ProductId);
-    private sealed record DashboardResponse(decimal? SalesTotal, int? SaleCount, int? LowStockCount, LowStockResponse[] LowStockProducts);
+    private sealed record DashboardResponse(decimal? TodaySalesTotal, int? TodaySaleCount, decimal? SalesTotal, int? SaleCount, int? LowStockCount, LowStockResponse[] LowStockProducts);
     private sealed record LowStockResponse(int ProductId, string SKU, int CurrentStock, int MinimumStock);
-    private sealed record ReportsResponse(SalesByDayResponse[] SalesByDay, TopProductResponse[] TopProducts, MovementResponse[] Movements);
+    private sealed record ReportsResponse(int SaleCount, decimal SalesTotal, SalesByDayResponse[] SalesByDay, TopProductResponse[] TopProducts, MovementResponse[] Movements);
     private sealed record SalesByDayResponse(DateTime DayUtc, int SaleCount, decimal Total);
     private sealed record TopProductResponse(int ProductId, string SKU, int Quantity, decimal Total);
     private sealed record MovementResponse(int Type, int MovementCount, int QuantityDelta);
+    private sealed record CreatedSaleResponse(long SaleId, string SaleNumber, decimal Total);
+    private sealed record SaleRowResponse(long SaleId, string SaleNumber, decimal Total);
+    private sealed record MovementRowResponse(int ProductId, string ProductName, DateTime CreatedAtUtc);
     private sealed record UserResponse(string Id, string UserName, string? Email, string[] Roles, bool IsLockedOut);
     private sealed record AuditResponse(long AuditLogId, string UserId, string UserName, string Action, string EntityName, string? EntityId, string? DetailsJson, string? IpAddress, DateTime CreatedAtUtc);
     private sealed record PageResponse<T>(T[] Items, int Page, int PageSize, int TotalCount, int TotalPages);
+}
+
+public sealed class AuditLogPrivacyTests
+{
+    [Fact]
+    public void AuditLog_RemovesSensitiveFieldsFromNestedDetails()
+    {
+        const string details = """
+            {
+              "name": "safe value",
+              "Password": "plain password",
+              "nested": {
+                "refresh_token": "refresh secret",
+                "Cookie": "session cookie",
+                "authorization": "bearer token",
+                "quantity": 4
+              },
+              "items": [{ "csrfToken": "csrf value", "sku": "SKU-1" }]
+            }
+            """;
+
+        var audit = new AuditLog("actor-1", "EntityUpdated", "Entity", "1", details, null);
+        using var sanitized = JsonDocument.Parse(audit.DetailsJson!);
+
+        Assert.Equal("safe value", sanitized.RootElement.GetProperty("name").GetString());
+        Assert.False(sanitized.RootElement.TryGetProperty("Password", out _));
+        var nested = sanitized.RootElement.GetProperty("nested");
+        Assert.Equal(4, nested.GetProperty("quantity").GetInt32());
+        Assert.False(nested.TryGetProperty("refresh_token", out _));
+        Assert.False(nested.TryGetProperty("Cookie", out _));
+        Assert.False(nested.TryGetProperty("authorization", out _));
+        var item = sanitized.RootElement.GetProperty("items")[0];
+        Assert.Equal("SKU-1", item.GetProperty("sku").GetString());
+        Assert.False(item.TryGetProperty("csrfToken", out _));
+        Assert.DoesNotContain("plain password", audit.DetailsJson, StringComparison.Ordinal);
+        Assert.DoesNotContain("refresh secret", audit.DetailsJson, StringComparison.Ordinal);
+        Assert.DoesNotContain("session cookie", audit.DetailsJson, StringComparison.Ordinal);
+        Assert.DoesNotContain("bearer token", audit.DetailsJson, StringComparison.Ordinal);
+        Assert.DoesNotContain("csrf value", audit.DetailsJson, StringComparison.Ordinal);
+    }
 }

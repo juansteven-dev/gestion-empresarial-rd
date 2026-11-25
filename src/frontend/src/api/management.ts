@@ -9,6 +9,8 @@ export interface PeriodQuery {
 export interface DashboardSummary {
   fromDate: string
   toDate: string
+  todaySalesTotal: number | null
+  todaySaleCount: number | null
   salesTotal: number | null
   saleCount: number | null
   lowStockCount: number | null
@@ -19,6 +21,8 @@ export interface DashboardSummary {
 export interface ReportsSummary {
   fromDate: string
   toDate: string
+  saleCount: number
+  salesTotal: number
   salesByDay: { dayUtc: string; saleCount: number; total: number }[]
   topProducts: { productId: number; sku: string; name: string; quantity: number; total: number }[]
   movements: { type: number; movementCount: number; quantityDelta: number }[]

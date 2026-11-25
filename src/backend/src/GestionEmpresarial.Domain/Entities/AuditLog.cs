@@ -27,7 +27,7 @@ public sealed class AuditLog
         Action = action.Trim();
         EntityName = entityName.Trim();
         EntityId = entityId;
-        DetailsJson = detailsJson;
+        DetailsJson = AuditDetailsSanitizer.Sanitize(detailsJson);
         IpAddress = ipAddress;
     }
 

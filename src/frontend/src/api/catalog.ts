@@ -96,6 +96,9 @@ export interface ListQuery {
 
 export interface MovementQuery {
   productId?: number
+  type?: number
+  fromUtc?: string
+  toUtc?: string
   page?: number
   pageSize?: number
 }

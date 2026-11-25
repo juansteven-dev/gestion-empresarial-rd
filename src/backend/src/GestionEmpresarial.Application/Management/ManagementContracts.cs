@@ -12,6 +12,8 @@ public sealed class PeriodQuery
 public sealed record DashboardSummaryDto(
     DateOnly FromDate,
     DateOnly ToDate,
+    decimal? TodaySalesTotal,
+    int? TodaySaleCount,
     decimal? SalesTotal,
     int? SaleCount,
     int? LowStockCount,
@@ -29,6 +31,8 @@ public sealed record MovementSummaryDto(MovementType Type, int MovementCount, in
 public sealed record ReportsSummaryDto(
     DateOnly FromDate,
     DateOnly ToDate,
+    int SaleCount,
+    decimal SalesTotal,
     IReadOnlyList<SalesByDayDto> SalesByDay,
     IReadOnlyList<TopSellingProductDto> TopProducts,
     IReadOnlyList<MovementSummaryDto> Movements);

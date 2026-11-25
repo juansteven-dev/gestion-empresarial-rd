@@ -26,6 +26,19 @@ public sealed class ManagementQueryService(
             sales = sales.Where(sale => sale.CreatedByUserId == currentUserId);
         }
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var todayFromUtc = DateTime.SpecifyKind(today.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+        var todayThroughUtc = DateTime.SpecifyKind(today.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
+        var todaySales = SalesInPeriod(todayFromUtc, todayThroughUtc);
+        if (canViewSales && !canViewAllSales)
+        {
+            todaySales = todaySales.Where(sale => sale.CreatedByUserId == currentUserId);
+        }
+
+        var todaySaleCount = canViewSales ? await todaySales.CountAsync(cancellationToken) : (int?)null;
+        decimal? todaySalesTotal = canViewSales
+            ? await todaySales.Select(sale => (decimal?)sale.Total).SumAsync(cancellationToken) ?? 0m
+            : null;
         var saleCount = canViewSales ? await sales.CountAsync(cancellationToken) : (int?)null;
         decimal? salesTotal = canViewSales
             ? await sales.Select(sale => (decimal?)sale.Total).SumAsync(cancellationToken) ?? 0m
@@ -55,6 +68,8 @@ public sealed class ManagementQueryService(
         return new DashboardSummaryDto(
             period.FromDate,
             period.ToDate,
+            todaySalesTotal,
+            todaySaleCount,
             salesTotal,
             saleCount,
             lowStockCount,
@@ -89,6 +104,8 @@ public sealed class ManagementQueryService(
                 .OrderBy(item => item.DayUtc)
                 .ToList();
         }
+        var saleCount = salesByDay.Sum(item => item.SaleCount);
+        var salesTotal = salesByDay.Sum(item => item.Total);
         var topProducts = await GetTopProductsAsync(
             period.FromUtc,
             period.ThroughUtc,
@@ -123,7 +140,7 @@ public sealed class ManagementQueryService(
                 .ToList();
         }
 
-        return new ReportsSummaryDto(period.FromDate, period.ToDate, salesByDay, topProducts, movements);
+        return new ReportsSummaryDto(period.FromDate, period.ToDate, saleCount, salesTotal, salesByDay, topProducts, movements);
     }
 
     public async Task<ManagementPageResult<AuditLogDto>> GetAuditLogsAsync(

@@ -80,10 +80,12 @@ La recepcion abre transaccion, reclama la fila con una actualizacion condicionad
 
 `SalesEndpointTests` ejecuta la concurrencia con EF Core InMemory y un interceptor de pruebas que coordina las dos lecturas y simula el conflicto de RowVersion. Este proveedor no demuestra el rollback relacional de SQL Server; una validacion completa de transacciones debe ejecutarse contra una base de pruebas SQL Server.
 
-## 13. Dashboard, reportes, usuarios y auditoría (Fase E)
+## 13. Dashboard, reportes, usuarios y auditoría (Fases E y F)
 
-`GET /api/v1/dashboard` recibe `fromDate` y `toDate` opcionales y devuelve agregados desde Sales, SaleItems y Products. El alcance cambia por rol: Administrador ve ventas globales e inventario, Empleado sus propias ventas, y EncargadoAlmacen inventario. `GET /api/v1/reports` requiere Administrador y devuelve ventas por día, productos más vendidos y movimientos agregados.
+`GET /api/v1/dashboard` recibe `fromDate` y `toDate` opcionales y consulta ventas completadas del día y período, conteos, productos más vendidos y productos en bajo stock. El alcance cambia por rol: Administrador ve ventas globales e inventario, Empleado sus propias ventas, y EncargadoAlmacen inventario. En producción `ApplicationDbContext` usa el proveedor EF Core SQL Server.
 
-`GET /api/v1/users` requiere Administrador y admite `search`, `page` y `pageSize`; `POST /api/v1/users` crea cuentas con Identity. La vista presenta los roles y si Identity considera la cuenta bloqueada. `GET /api/v1/audit` requiere Administrador y admite `search`, `userId`, `fromDate`, `toDate`, `page` y `pageSize`. Estas consultas usan entidades existentes y no requieren migración.
+`GET /api/v1/reports` requiere Administrador y consulta conteo e importe total, ventas agrupadas por día, productos más vendidos y movimientos agrupados. El listado paginado de ventas reutiliza `GET /api/v1/sales` con `search`, `fromDate`, `toDate`, `page` y `pageSize`. El detalle paginado de movimientos reutiliza `GET /api/v1/inventory/movements` con `productId`, `fromUtc`, `toUtc`, `page` y `pageSize`.
+
+`GET /api/v1/users` requiere Administrador y admite `search`, `page` y `pageSize`; `POST /api/v1/users` crea cuentas con Identity. La vista presenta los roles y si Identity considera la cuenta bloqueada. `GET /api/v1/audit` requiere Administrador y admite `search`, `userId`, `fromDate`, `toDate`, `page` y `pageSize`. `AuditLog` elimina recursivamente propiedades sensibles de `DetailsJson` antes de persistir. Estas consultas usan entidades existentes y no requieren migración.
 
 Las integraciones frontend están en `src/frontend/src/api`; Dashboard, Reportes, Usuarios y Auditoría consumen esos endpoints. El bundle de Reportes carga de forma diferida para mantener los gráficos fuera del paquete inicial.

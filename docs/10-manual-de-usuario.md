@@ -12,7 +12,7 @@ Abre la URL local configurada en Vite e ingresa el usuario y la contraseña asig
 
 ## 3. Dashboard
 
-El Dashboard consulta el período elegido y presenta ventas completadas e importe, productos vendidos y alertas de existencias. Administrador ve ventas globales e inventario, Empleado solo sus propias ventas y EncargadoAlmacen alertas de inventario. Cuando no existen registros en el período, la pantalla lo indica sin sustituirlos por datos de ejemplo.
+El Dashboard presenta importe y cantidad de ventas de hoy y del período elegido, productos más vendidos y alertas de existencias. Administrador ve ventas globales e inventario, Empleado solo sus propias ventas y EncargadoAlmacen alertas de inventario. Cuando no existen registros en el período, la pantalla lo indica sin sustituirlos por datos de ejemplo.
 
 ## 4. Productos y categorías
 
@@ -36,7 +36,7 @@ Explicar alertas de bajo stock, movimientos, ajustes con motivo e historial.
 
 ## 9. Reportes
 
-Administrador puede filtrar por fechas para consultar ventas por día, productos más vendidos y variaciones agregadas de inventario. Los gráficos y tablas se muestran desde la respuesta del servidor; si el período no tiene actividad, la pantalla informa que no hay datos.
+Administrador puede filtrar por fechas para consultar importe y cantidad de ventas, ventas por día, productos más vendidos y movimientos agregados. La tabla de ventas permite filtrar por número y paginar resultados. El detalle de movimientos admite filtro por producto y fecha, y también se pagina. Los gráficos y tablas se muestran desde la API; si el período no tiene actividad, la pantalla informa que no hay datos.
 
 ## 10. Mensajes frecuentes
 

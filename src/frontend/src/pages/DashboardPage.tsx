@@ -42,8 +42,8 @@ export function DashboardPage() {
         : query.isError ? <p className="catalog-message error-text" role="alert">{getApiErrorMessage(query.error)}</p>
           : <>
             {canSeeSales && <div className="analytics-cards">
+              <article className="analytics-card"><span>Ventas de hoy</span><strong>{currency.format(query.data.todaySalesTotal ?? 0)}</strong><small>{query.data.todaySaleCount ?? 0} ventas completadas</small></article>
               <article className="analytics-card"><span>Ventas del período</span><strong>{currency.format(query.data.salesTotal ?? 0)}</strong><small>{query.data.saleCount ?? 0} ventas completadas</small></article>
-              <article className="analytics-card"><span>Productos destacados</span><strong>{query.data.topProducts.length}</strong><small>Productos con ventas en el período</small></article>
             </div>}
             {canSeeInventory && <section className="analytics-panel">
               <div className="section-heading-row"><div><p className="eyebrow">Inventario</p><h2 className="section-title">Existencias en mínimo o por debajo</h2></div><Link className="text-button" to="/inventory">Ver inventario</Link></div>

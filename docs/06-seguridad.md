@@ -53,6 +53,8 @@ El dashboard aplica alcance de datos en servidor: Administrador ve métricas glo
 
 Registrar al menos: creación/edición/desactivación de productos y suplidores; recepción de compras; ventas; ajustes de stock; creación/desactivación de usuarios y cambios de roles. Campos: UserId, Action, EntityName, EntityId, DetailsJson filtrado, IpAddress si procede, CreatedAtUtc. Nunca guardar credenciales, cookies, tokens o números de tarjetas.
 
+`AuditLog` depura recursivamente de `DetailsJson` las propiedades cuyos nombres indican contraseña, cookie, token, secreto, autorización o credencial antes de persistirlas.
+
 ## 8.6 Copias de seguridad
 
 Documentar una copia manual de SQL Server:
